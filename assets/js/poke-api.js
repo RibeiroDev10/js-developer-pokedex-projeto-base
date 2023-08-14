@@ -1,5 +1,29 @@
 const pokeApi = {};
 
+function convertPokeApiDetailToPokemon(pokeDetail)
+{
+    const pokemonModel = new Pokemon();
+    pokemonModel.name = pokeDetail.name;
+    pokemonModel.number = pokeDetail.number;
+
+    const types = pokeDetail.types.map((typeSlot) => typeSlot.type.name)
+    const [type] = types;
+
+    pokemonModel.types = types;
+    pokemonModel.type = type;
+    pokemonModel.photo = pokeDetail.sprites.other.dream_world.front_default;
+
+    return ;
+}
+
+pokeApi.getPokemonDetail = (pokemon) => {
+    return fetch(pokemon.url)
+            .then((response) => response.json())
+            .then((pokemon) => {
+                
+            })
+}
+
     // Função que abstrai o consumo do HTTP
 pokeApi.getPokemons = (offset = 0, limit = 10) => {
 
@@ -12,7 +36,9 @@ pokeApi.getPokemons = (offset = 0, limit = 10) => {
         // Recebendo o body convertido. Sempre o que vai pro retorno do 2º Then é o return do 1º
         // No segundo then temos a capacidade de manipular o JSON de resposta.
         .then((jsonBody) => jsonBody.results)
-        .catch((error) => console.log(error));
+        .then((pokemons) => pokemons.map(pokeApi.getPokemonDetail))
+        .then((detailRequests) => Promise.all(detailRequests))
+        .then((pokemonDetails) => pokemonDetails)
 }
 
 Promise.all([
